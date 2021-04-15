@@ -22,13 +22,15 @@ for var in "$@"
 do
 
 if [ "$var" == "$1" ]; then
-  mkdir -p $blockPath
-  touch $blockPath/"$1".css
-  printf ".$var {\n\n}\n" >> $blockPath/"$1".css
-  if [ "$media_flag" == "true" ]; then
-    printf "\n@media (min-width: 425px) {\n\n}\n\n@media (min-width: 768px) {\n\n}\n\n@media (min-width: 1024px) {\n\n}\n\n@media (min-width: 1280px) {\n\n}\n" >> $blockPath/"$1".css
+  if [ ! -d $blockPath ]; then
+    mkdir -p $blockPath
+    touch $blockPath/"$1".css
+    printf ".$var {\n\n}\n" >> $blockPath/"$1".css
+    if [ "$media_flag" == "true" ]; then
+      printf "\n@media (min-width: 425px) {\n\n}\n\n@media (min-width: 768px) {\n\n}\n\n@media (min-width: 1024px) {\n\n}\n\n@media (min-width: 1280px) {\n\n}\n" >> $blockPath/"$1".css
+    fi
+    printf "\n@import url(../blocks/"$1"/"$1".css);\n" >> ./pages/index.css
   fi
-  printf "\n@import url(../blocks/"$1"/"$1".css);\n" >> ./pages/index.css
 else
   mkdir -p $blockPath/"$var"
   touch $blockPath/"$var"/"$1""$var".css
