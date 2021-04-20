@@ -1,15 +1,16 @@
 #!/bin/bash
 
-media_flag=""
+media_flag="false"
+media_all_flag="false"
 declare -a media_breakpoints_raw
 declare -a media_breakpoints
 
 print_usage() {
-  printf "\nUsage: ./makefiles [-m \"425 768 1024\"] bemBlockName [__bemElementOrModifierName]\n"
+  printf "\nUsage: ./makefiles [-s \"425 768 1024\" || -a \"425 768 1024\"] bemBlockName [__bemElementOrModifierName]\n"
 }
 
 add_media_queries() {
-  #put all breakpoints even from multiple -m flags into a flat array
+  #put all breakpoints even from multiple -s flags into a flat array
   if [[ ! ${media_breakpoints[@]} > 0 ]]; then
     for point in "${media_breakpoints_raw[@]}"
     do
@@ -23,10 +24,12 @@ add_media_queries() {
 }
 
 #scan for flags
-while getopts 'm:' flag; do
+while getopts 's:a:' flag; do
   case "${flag}" in
-    m) media_flag='true'
+    s) media_flag='true'
        media_breakpoints_raw+=("$OPTARG");;
+    a) media_all_flag='true'
+        media_breakpoints_raw+=("$OPTARG");;
     *) print_usage
        exit 1 ;;
   esac
@@ -34,6 +37,16 @@ done
 shift $((OPTIND -1))
 
 blockPath=./blocks/"$1"
+
+#add specified breakpoints to all .css files in a block
+if [[ $media_all_flag == 'true' ]]; then
+  FILES=($(find $blockPath -name "*.css" 2>/dev/null))
+  for file in "${FILES[@]}"
+  do
+    add_media_queries $file $(basename $file .css)
+  done
+  exit
+fi
 
 for var in "$@"
 do
