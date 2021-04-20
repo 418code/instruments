@@ -42,6 +42,18 @@ make_folder() {
   fi
 }
 
+create_all() {
+  #the main section of the script
+  for var in $@
+  do
+    if [[ $var == $1 ]]; then
+      make_folder $blockPath $1
+    else
+      make_folder $blockPath $1 $var
+    fi
+  done
+}
+
 #scan for flags
 while getopts 's:a:' flag; do
   case "${flag}" in
@@ -67,11 +79,4 @@ if [[ $media_all_flag == 'true' ]]; then
   exit
 fi
 
-for var in "$@"
-do
-  if [[ $var == $1 ]]; then
-    make_folder $blockPath $1
-  else
-    make_folder $blockPath $1 $var
-  fi
-done
+create_all "$@"
