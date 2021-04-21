@@ -27,7 +27,7 @@ make_folder() {
   # creates a folder with bem .css file with optional media queries or appends existing with media queries
   # argumens: blockpath, block name, element name
   directory=$1/$3
-  cssPath=$(readlink -m $directory/$2$3.css) #remove extra slashes if any
+  cssPath=$(echo "$directory/$2$3.css" | tr -s / /) #remove extra slashes if any
   if [[ ! -d $directory ]]; then
     mkdir -p $directory
     touch $cssPath
@@ -35,7 +35,11 @@ make_folder() {
     if [ "$media_flag" == "true" ]; then
       add_media_queries $cssPath "$2$3"
     fi
-    printf "\n@import url(.$cssPath);\n" >> ./pages/index.css
+    if [ "$directory" == "$1/" ]; then
+      printf "\n@import url(.$cssPath);\n" >> ./pages/index.css
+    else
+      printf "@import url(.$cssPath);\n" >> ./pages/index.css
+    fi
   #if the block exist, and media flag, appent media breakpoints to file
   elif [ -d $directory ] && [ "$media_flag" == "true" ]; then
     add_media_queries $cssPath "$2$3"
